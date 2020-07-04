@@ -1,0 +1,1 @@
+/Users/jmurray/opt/anaconda3/etc/fish/conf.d/conda.fish
