@@ -21,3 +21,9 @@ echo "  You'll need to install fish and set it as your shell manually"
 # Git
 echo "Initializing git..."
 delete_and_link ~/.gitconfig gitconfig
+
+# asciiArt
+echo "Initializing asciiArt..."
+delete_and_link ~/asciiArt asciiArt
+
+#TODO: fonts would be nice 
