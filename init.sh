@@ -18,6 +18,11 @@ echo "Initializing fish..."
 delete_and_link ~/.config/fish fish
 echo "  You'll need to install fish and set it as your shell manually"
 
+# Fish
+echo "Initializing kitty..."
+delete_and_link ~/.config/kitty kitty
+echo "  You'll need to install kitty manually"
+
 # Git
 echo "Initializing git..."
 delete_and_link ~/.gitconfig gitconfig
