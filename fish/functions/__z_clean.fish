@@ -8,4 +8,6 @@ function __z_clean -d "Clean up .z file to remove paths no longer valid"
     end < $Z_DATA > $tmpfile
     command mv -f $tmpfile $Z_DATA
   end
+
+  __z_complete
 end

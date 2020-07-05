@@ -4,6 +4,11 @@ if not functions -q fisher
     curl https://git.io/fisher --create-dirs -sLo $XDG_CONFIG_HOME/fish/functions/fisher.fish
     fish -c fisher
 end
+
+set -g Z_DATA $HOME/.local/share/z/data
+set -g Z_DATA_DIR $HOME/.local/share/z
+set -g Z_EXCLUDE $HOME
+
 set -g ASCII_DIR (realpath ~/asciiArt)
 # bob the fish stuff
 source ~/.config/fish/config/bobTheFish.fish

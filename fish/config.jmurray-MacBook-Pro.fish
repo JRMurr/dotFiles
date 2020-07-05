@@ -3,6 +3,7 @@ if type -q nvm
 end
 sudo ifconfig lo0 alias 10.0.2.2
 
+
 #misc
 alias myip="ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'"
 alias jsonJs="pbpaste | json-to-js --spaces=4 | pbcopy; pbpaste"

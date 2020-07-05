@@ -44,4 +44,6 @@ function __z_add -d "Add PATH to .z file"
     command mv $tmpfile $Z_DATA
     or command rm $tmpfile
   end
+
+  __z_complete
 end

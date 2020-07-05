@@ -13,6 +13,11 @@ delete_and_link() {
     ln -s $script_dir/$dest_path $link_path
 }
 
+exists()
+{
+    command -v "$1" >/dev/null 2>&1
+}
+
 # Fish
 echo "Initializing fish..."
 delete_and_link ~/.config/fish fish
@@ -31,4 +36,8 @@ delete_and_link ~/.gitconfig gitconfig
 echo "Initializing asciiArt..."
 delete_and_link ~/asciiArt asciiArt
 
-#TODO: fonts would be nice 
+
+if exists i3; then
+  echo "Initializing i3..."
+  delete_and_link ~/.i3/config i3/config
+fi
