@@ -44,10 +44,8 @@ eval /Users/jmurray/opt/anaconda3/bin/conda "shell.fish" "hook" $argv | source
 # <<< conda initialize <<<
 
 function killPg
-    docker stop bodata_postgres
-    docker rm bodata_postgres
-    docker stop immuta-db-dev
-    docker rm immuta-db-dev
+    dockerStop bodata_postgres
+    dockerStop immuta-db-dev
 end
 
 function buildPost
