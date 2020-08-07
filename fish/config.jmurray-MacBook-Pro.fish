@@ -1,5 +1,5 @@
 if type -q nvm
-    nvm use 10
+    nvm use 12
 end
 sudo ifconfig lo0 alias 10.0.2.2
 
