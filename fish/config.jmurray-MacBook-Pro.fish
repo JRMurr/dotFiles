@@ -32,7 +32,7 @@ alias pgBo="pgcli postgresql://bometa:secret@localhost:5432/bometadata"
 alias pgFe=" psql postgresql://feature_service:secret@localhost:5432/immuta"
 alias buildRun="bash ~/scripts/buildBodataPost.sh; sleep 40; npm start"
 alias cdBo="cd ~/immuta/bodata/service"
-alias gFdw="IT_UNOBFUSCATED=true grunt mochaTest:fdw"
+alias fdwIT="IT_UNOBFUSCATED=true npm run mocha -- fdw_it/fdw.it.spec.js"
 alias npmc="cd ~/immuta/bodata/service && npm run console:dev"
 alias npms="cd ~/immuta/bodata/service && npm run server"
 
@@ -49,12 +49,14 @@ function killPg
 end
 
 function buildPost
-    killPg
-    pushd $BODATA_DIR
-    make db MAKE_JOBS=4
-    docker run -d -p 5432:5432 --name=bodata_postgres --add-host=service.immuta:10.0.2.2 -e IMMUTA_REMOTE_QUERY=true -i -t immuta-db:latest-odbc
-    popd
-    docker logs -f bodata_postgres
+    if read_confirm "Do you want to stop and rebuild the pg container?"
+        killPg
+        pushd $BODATA_DIR
+        make db MAKE_JOBS=4
+        docker run -d -p 5432:5432 --name=bodata_postgres --add-host=service.immuta:10.0.2.2 -e IMMUTA_REMOTE_QUERY=true -i -t immuta-db:latest-odbc
+        popd
+        docker logs -f bodata_postgres
+    end
 end
 
 function buildFinger
@@ -68,17 +70,22 @@ function buildFinger
 end
 
 function buildDevPost
-    killPg
-    pushd $BODATA_DIR
-    make db MAKE_JOBS=4
-    popd
-    pushd $BODATA_DIR/postgresql
-    docker build -t immuta-db-dev -f DevDocker .
-    # docker run -d -p 5432:5432 -v ${PWD}:/src --name=immuta-db-dev -e IMMUTA_REMOTE_QUERY=true --add-host=service.immuta:10.0.2.2 -it immuta-db-dev 
-    # docker run -d --cap-add=SYS_PTRACE --cap-add=SYS_TIME --security-opt seccomp=unconfined -e IMMUTA_REMOTE_QUERY=true -p 5432:5432 -v ${PWD}:/usr/src --name=immuta-db-dev --add-host=service.immuta:10.0.2.2 -it immuta-db-dev
-    docker run -d --cap-add=SYS_PTRACE --cap-add=SYS_TIME --security-opt seccomp=unconfined -e IMMUTA_REMOTE_QUERY=true -p 5432:5432 -p 9091:9091 -v $PWD:/usr/src -v $BODATA_DIR:/bodata --name=immuta-db-dev --add-host=service.immuta:10.0.2.2 -it immuta-db-dev
-    popd
-    # docker run -d -p 5432:5432 -v ${PWD}:/src --name=immuta-db-dev -e IMMUTA_REMOTE_QUERY=true --add-host=service.immuta:10.0.2.2 -it immuta-db-dev 
-    #docker run -d -p 5432:5432 -v ${PWD}:/src --name=immuta-db-dev --add-host=service.immuta:10.0.2.2 -it immuta-db-dev 
+    if read_confirm "Do you want to stop and rebuild the pg container?"
+        killPg
+        pushd $BODATA_DIR
+        make db MAKE_JOBS=4
+        popd
+        pushd $BODATA_DIR/postgresql
+        docker build -t immuta-db-dev -f DevDocker .
+        # docker run -d -p 5432:5432 -v ${PWD}:/src --name=immuta-db-dev -e IMMUTA_REMOTE_QUERY=true --add-host=service.immuta:10.0.2.2 -it immuta-db-dev 
+        # docker run -d --cap-add=SYS_PTRACE --cap-add=SYS_TIME --security-opt seccomp=unconfined -e IMMUTA_REMOTE_QUERY=true -p 5432:5432 -v ${PWD}:/usr/src --name=immuta-db-dev --add-host=service.immuta:10.0.2.2 -it immuta-db-dev
+        docker run -d --cap-add=SYS_PTRACE --cap-add=SYS_TIME --security-opt seccomp=unconfined -e IMMUTA_REMOTE_QUERY=true -p 5432:5432 -p 9091:9091 -v $PWD:/usr/src -v $BODATA_DIR:/bodata --name=immuta-db-dev --add-host=service.immuta:10.0.2.2 -it immuta-db-dev
+        popd
+        # docker run -d -p 5432:5432 -v ${PWD}:/src --name=immuta-db-dev -e IMMUTA_REMOTE_QUERY=true --add-host=service.immuta:10.0.2.2 -it immuta-db-dev 
+        #docker run -d -p 5432:5432 -v ${PWD}:/src --name=immuta-db-dev --add-host=service.immuta:10.0.2.2 -it immuta-db-dev 
+    end
 end
 
+function mochaFile
+    npx _mocha -r source-map-support/register -r ts-node/register --timeout 999999 --colors $argv
+end
