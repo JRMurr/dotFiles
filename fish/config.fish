@@ -5,6 +5,11 @@ if not functions -q fisher
     fish -c fisher
 end
 
+# load all the custom funcs 
+for file in ~/.config/fish/customFuncs/*
+    source $file
+end
+
 set -g Z_DATA $HOME/.local/share/z/data
 set -g Z_DATA_DIR $HOME/.local/share/z
 set -g Z_EXCLUDE $HOME
