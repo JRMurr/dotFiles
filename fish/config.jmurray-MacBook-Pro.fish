@@ -3,6 +3,9 @@ if type -q nvm
 end
 sudo ifconfig lo0 alias 10.0.2.2
 
+# ghcup-env
+set -q GHCUP_INSTALL_BASE_PREFIX[1]; or set GHCUP_INSTALL_BASE_PREFIX $HOME
+test -f /Users/jmurray/.ghcup/env ; and set -gx PATH $HOME/.cabal/bin /Users/jmurray/.ghcup/bin $PATH
 
 #misc
 alias myip="ifconfig | sed -En 's/127.0.0.1//;s/.*inet (addr:)?(([0-9]*\.){3}[0-9]*).*/\2/p'"
@@ -11,7 +14,11 @@ alias jsonJs="pbpaste | json-to-js --spaces=4 | pbcopy; pbpaste"
 
 set -g BODATA_DIR "/Users/jmurray/immuta/bodata"
 set -g FINGERPRINT_DIR "/Users/jmurray/immuta/fingerprint"
+set -g -x NODE_OPTIONS "--max_old_space_size=5120"
 
+
+set -x GOPATH /Users/jmurray/go/
+set -x PATH $PATH /usr/local/go/bin $GOPATH/bin
 
 alias sshB="ssh -A -l jmurray bastion.immuta.com"
 alias gUnit="grunt mocha_istanbul:unit"
@@ -54,7 +61,7 @@ function buildPost
         pushd $BODATA_DIR
         if not make db MAKE_JOBS=4
             popd
-            exit 1
+            return 1
         end
         docker run -d -p 5432:5432 --name=bodata_postgres --add-host=service.immuta:10.0.2.2 -e IMMUTA_REMOTE_QUERY=true -i -t immuta-db:latest-odbc
         popd
@@ -73,7 +80,7 @@ function buildFinger
     docker rm immuta-fingerprint
     pushd $FINGERPRINT_DIR
     make fingerprint
-    docker run -d -p 5001:5001 --name=immuta-fingerprint --add-host=db.immuta:10.0.2.2 immuta-fingerprint
+    docker run -d -p 5001:5001 --name=immuta-fingerprint --add-host=db.immuta:10.0.2.2 $argv immuta-fingerprint
     popd
     docker logs -f immuta-fingerprint
 end
@@ -84,7 +91,7 @@ function buildDevPost
         pushd $BODATA_DIR
         if not make db MAKE_JOBS=4
             popd
-            exit 1
+            return 1
         end
         popd
         pushd $BODATA_DIR/postgresql
@@ -92,7 +99,7 @@ function buildDevPost
         # docker run -d -p 5432:5432 -v ${PWD}:/src --name=immuta-db-dev -e IMMUTA_REMOTE_QUERY=true --add-host=service.immuta:10.0.2.2 -it immuta-db-dev 
         # docker run -d --cap-add=SYS_PTRACE --cap-add=SYS_TIME --security-opt seccomp=unconfined -e IMMUTA_REMOTE_QUERY=true -p 5432:5432 -v ${PWD}:/usr/src --name=immuta-db-dev --add-host=service.immuta:10.0.2.2 -it immuta-db-dev
         # docker run -d --cap-add=SYS_PTRACE --cap-add=SYS_TIME --security-opt seccomp=unconfined -e IMMUTA_REMOTE_QUERY=true -p 5432:5432 -p 9091:9091 -v $PWD:/usr/src -v $BODATA_DIR:/bodata --name=immuta-db-dev --add-host=service.immuta:10.0.2.2 -it immuta-db-dev
-        docker run -d --cap-add=SYS_PTRACE --cap-add=SYS_TIME --security-opt seccomp=unconfined -e IMMUTA_REMOTE_QUERY=true -p 5432:5432 -v {$PWD}:/usr/src --name=immuta-db-dev --add-host=service.immuta:10.0.2.2 -it immuta-db-dev
+        docker run -d --cap-add=SYS_PTRACE --cap-add=SYS_TIME --security-opt seccomp=unconfined -e IMMUTA_REMOTE_QUERY=true -p 5432:5432 -v {$PWD}:/usr/src --name=immuta-db-dev --add-host=service.immuta:10.0.2.2 $argv -it immuta-db-dev
         popd
         # docker run -d -p 5432:5432 -v ${PWD}:/src --name=immuta-db-dev -e IMMUTA_REMOTE_QUERY=true --add-host=service.immuta:10.0.2.2 -it immuta-db-dev 
         #docker run -d -p 5432:5432 -v ${PWD}:/src --name=immuta-db-dev --add-host=service.immuta:10.0.2.2 -it immuta-db-dev 
@@ -100,5 +107,5 @@ function buildDevPost
 end
 
 function mochaFile
-    npx _mocha -r source-map-support/register -r ts-node/register --timeout 999999 --colors $argv
+    npx _mocha --inline-diffs -r source-map-support/register -r ts-node/register --timeout 999999 --colors $argv
 end
