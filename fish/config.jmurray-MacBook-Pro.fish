@@ -25,6 +25,7 @@ alias sshB="ssh -A -l jmurray bastion.immuta.com"
 alias gUnit="grunt mocha_istanbul:unit"
 alias bocode="code ~/immuta/bodata"
 alias fingerCode="code ~/immuta/fingerprint"
+alias cliCode="code ~/immuta/cli"
 
 alias pgKris="psql -d immuta -U kris -h localhost"
 alias pgJeff="psql -d immuta -U jeff -h localhost"
@@ -112,8 +113,14 @@ function mochaFile
 end
 
 
-function im
+function im --wraps="immuta"
     pushd $CLI_DIR
     go run main.go $argv
+    popd
+end
+
+function imComplete
+    pushd $CLI_DIR
+    go run main.go completion fish > ~/.config/fish/completions/immuta.fish
     popd
 end
