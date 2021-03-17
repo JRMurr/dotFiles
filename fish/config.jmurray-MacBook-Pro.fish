@@ -14,6 +14,7 @@ alias jsonJs="pbpaste | json-to-js --spaces=4 | pbcopy; pbpaste"
 
 set -g BODATA_DIR "/Users/jmurray/immuta/bodata"
 set -g FINGERPRINT_DIR "/Users/jmurray/immuta/fingerprint"
+set -g CLI_DIR "/Users/jmurray/immuta/cli"
 set -g -x NODE_OPTIONS "--max_old_space_size=5120"
 
 
@@ -108,4 +109,11 @@ end
 
 function mochaFile
     npx _mocha --inline-diffs -r source-map-support/register -r ts-node/register --timeout 999999 --colors $argv
+end
+
+
+function im
+    pushd $CLI_DIR
+    go run main.go $argv
+    popd
 end
