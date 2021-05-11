@@ -5,6 +5,6 @@ alias cleanSquash="git-delete-squashed"
 alias sshAm="ssh -i ~/personal/jr.pem ec2-user@ec2-35-170-192-165.compute-1.amazonaws.com"
 alias gitSyncUp="git fetch upstream; git rebase upstream/master"
 alias lzd="lazydocker"
-
+alias ls="exa"
 
 alias grm="go run main.go"
