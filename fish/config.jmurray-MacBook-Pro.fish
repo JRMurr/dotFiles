@@ -27,6 +27,7 @@ alias bocode="code ~/immuta/bodata"
 alias fingerCode="code ~/immuta/fingerprint"
 alias cliCode="code ~/immuta/cli"
 
+
 alias pgKris="psql -d immuta -U kris -h localhost"
 alias pgJeff="psql -d immuta -U jeff -h localhost"
 alias cliKris="pgcli postgresql://kris:pass@db.immuta:5432/immuta"
@@ -71,6 +72,13 @@ function buildPost
     end
 end
 
+function npmBo
+    pushd "$BODATA_DIR/service"
+    wipeAllNode
+    npm install
+    popd
+end
+
 function restartPg
     dockerStop bodata_postgres
     docker run -d -p 5432:5432 --name=bodata_postgres --add-host=service.immuta:10.0.2.2 -e IMMUTA_REMOTE_QUERY=true -i -t immuta-db
@@ -81,8 +89,13 @@ function buildFinger
     docker stop immuta-fingerprint
     docker rm immuta-fingerprint
     pushd $FINGERPRINT_DIR
-    make fingerprint
-    docker run -d -p 5001:5001 --name=immuta-fingerprint --add-host=db.immuta:10.0.2.2 $argv immuta-fingerprint
+    make docker-build
+    docker run \
+        --detach \
+        --publish 5001:5001 \
+        --name=immuta-fingerprint \
+        --add-host=db.immuta:10.0.2.2 \
+        immuta-fingerprint
     popd
     docker logs -f immuta-fingerprint
 end
