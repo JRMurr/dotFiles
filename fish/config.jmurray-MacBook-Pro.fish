@@ -45,18 +45,13 @@ alias cdBo="cd ~/immuta/bodata/service"
 alias fdwIT="IT_UNOBFUSCATED=true npm run mocha -- fdw_it/fdw.it.spec.js"
 alias nodeIT="IT_UNOBFUSCATED=true npm run mocha -- it/*.spec.js"
 alias npmc="cd ~/immuta/bodata/service && npm run console:dev"
-alias npms="cd ~/immuta/bodata/service && npm run server"
+alias npms="cd ~/immuta/bodata/service && npm run server:dev"
 
 
 # >>> conda initialize >>>
 # !! Contents within this block are managed by 'conda init' !!
 eval /Users/jmurray/opt/anaconda3/bin/conda "shell.fish" "hook" $argv | source
 # <<< conda initialize <<<
-
-function killPg
-    dockerStop bodata_postgres
-    dockerStop immuta-db-dev
-end
 
 function buildPost
     if read_confirm "Do you want to stop and rebuild the pg container?"

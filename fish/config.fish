@@ -6,7 +6,7 @@ if not functions -q fisher
 end
 
 # load all the custom funcs 
-for file in ~/.config/fish/customFuncs/*
+for file in ~/.config/fish/customFuncs/common/*
     source $file
 end
 
@@ -24,5 +24,11 @@ source ~/.config/fish/aliases.fish
 # Load additional config based on hostname
 set host_config ~/.config/fish/config.(hostname).fish
 test -r $host_config; and source $host_config
+
+if test -d  ~/.config/fish/customFuncs/(hostname)
+    for file in ~/.config/fish/customFuncs/(hostname)/*
+        source $file
+    end
+end
 
 # if [ $PWD = (realpath ~) ]; randomAsciiImage; end
