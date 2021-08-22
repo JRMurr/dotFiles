@@ -16,3 +16,8 @@ function resetPulse
     pulseaudio -k
     pulseaudio --start
 end
+
+function setupLorri
+    lorri init
+    direnv allow
+end
