@@ -1,6 +1,5 @@
 # This is Git's per-user configuration file.
 [user]
-# Please adapt and uncomment the following lines:
 	name = John Murray
 	email = 5672686+JRMurr@users.noreply.github.com
 [core]
@@ -33,3 +32,7 @@
     lg = log --graph --abbrev-commit --decorate --format=format:'%C(bold blue)%h%C(reset) - %C(bold green)(%ar)%C(reset) %C(white)%s%C(reset) %C(dim white)- %an%C(reset)%C(bold yellow)%d%C(reset)' --a
 [pager]
 	branch = false
+[pull]
+	ff = only
+[includeIf "gitdir:~/immuta/"]
+    path = ~/.immuta.gitconfig

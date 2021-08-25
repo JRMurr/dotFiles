@@ -4,8 +4,7 @@ function startDev
 
     kitty @ set-tab-title $tab_title
     kitty @ launch --match $tab_matcher --copy-env \
-        fish -c "npms"
-    npmc
-
-    kitty @ goto-layout --match $tab_matcher vertical
+        fish -c "npmc"
+    kitty @ resize-window --self --axis vertical --increment 50
+    npms
 end
