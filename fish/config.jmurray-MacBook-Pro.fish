@@ -53,19 +53,6 @@ alias npms="cd ~/immuta/bodata/service && npm run server:dev"
 eval /Users/jmurray/opt/anaconda3/bin/conda "shell.fish" "hook" $argv | source
 # <<< conda initialize <<<
 
-function buildPost
-    if read_confirm "Do you want to stop and rebuild the pg container?"
-        killPg
-        pushd $BODATA_DIR
-        if not make db VISIBILITY=internal MAKE_JOBS=4
-            popd
-            return 1
-        end
-        docker run -d -p 5432:5432 --name=bodata_postgres --add-host=service.immuta:10.0.2.2 -e IMMUTA_REMOTE_QUERY=true -i -t immuta-db
-        popd
-        docker logs -f bodata_postgres
-    end
-end
 
 function npmBo
     pushd "$BODATA_DIR/service"
@@ -74,9 +61,10 @@ function npmBo
     popd
 end
 
-function restartPg
+function restartPg --wraps="docker run"
     dockerStop bodata_postgres
-    docker run -d -p 5432:5432 --name=bodata_postgres --add-host=service.immuta:10.0.2.2 -e IMMUTA_REMOTE_QUERY=true -i -t immuta-db
+    # -e PG_LOG_MIN_MESSAGES=debug1
+    docker run -d -p 5432:5432 --name=bodata_postgres --add-host=service.immuta:10.0.2.2 -e IMMUTA_REMOTE_QUERY=true $argv -i -t immuta-db 
     docker logs -f bodata_postgres
 end
 
@@ -154,4 +142,8 @@ function imComplete
     pushd $CLI_DIR
     go run main.go completion fish > ~/.config/fish/completions/immuta.fish
     popd
+end
+
+function kubePub --wraps="kubectl"
+    kubectl --context kube-1.partner.immuta.com:jmurray $argv
 end
