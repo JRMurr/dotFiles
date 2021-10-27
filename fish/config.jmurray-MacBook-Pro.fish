@@ -1,5 +1,5 @@
 if type -q nvm
-    nvm use 12
+    nvm use 14
 end
 sudo ifconfig lo0 alias 10.0.2.2
 
@@ -88,12 +88,16 @@ function fingerBash
 end
 
 function buildFingerDev
+    argparse r/runOnly -- $argv
+        or return # exit if argparse failed because it found an option it didn't recognize - it will print an error
     docker stop immuta-fingerprint
     docker rm immuta-fingerprint
     docker stop immuta-fingerprint-devel
     docker rm immuta-fingerprint-devel
     pushd $FINGERPRINT_DIR
-    make immuta-fingerprint-devel
+    if not set -q _flag_runOnly
+        make immuta-fingerprint-devel
+    end
     echo "run 'poetry run immuta-fingerprint --log-level DEBUG' when u get in the container"
     docker run \
         -it \
