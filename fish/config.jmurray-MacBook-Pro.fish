@@ -1,6 +1,9 @@
 if type -q nvm
     nvm use 14
 end
+if type -q direnv
+    direnv hook fish | source
+end
 sudo ifconfig lo0 alias 10.0.2.2
 
 # ghcup-env
