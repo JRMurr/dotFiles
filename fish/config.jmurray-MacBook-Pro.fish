@@ -53,88 +53,13 @@ alias npms="cd ~/immuta/bodata/service && npm run server:dev"
 eval /Users/jmurray/opt/anaconda3/bin/conda "shell.fish" "hook" $argv | source
 # <<< conda initialize <<<
 
-
-function npmBo
-    pushd "$BODATA_DIR/service"
-    wipeAllNode
-    npm install
-    popd
-end
-
-function restartPg --wraps="docker run"
-    dockerStop bodata_postgres
-    # -e PG_LOG_MIN_MESSAGES=debug1
-    docker run -d -p 5432:5432 --name=bodata_postgres --add-host=service.immuta:10.0.2.2 -e IMMUTA_REMOTE_QUERY=true $argv -i -t immuta-db 
-    docker logs -f bodata_postgres
-end
-
-function buildFinger
-    docker stop immuta-fingerprint
-    docker rm immuta-fingerprint
-    pushd $FINGERPRINT_DIR
-    make immuta-fingerprint
-    docker run \
-        --detach \
-        --publish 5001:5001 \
-        --name=immuta-fingerprint \
-        --add-host=db.immuta:10.0.2.2 \
-        immuta-fingerprint
-    popd
-    docker logs -f immuta-fingerprint
-end
-
 function fingerBash
     docker exec -it immuta-fingerprint /bin/bash 
-end
-
-function buildFingerDev
-    argparse r/runOnly -- $argv
-        or return # exit if argparse failed because it found an option it didn't recognize - it will print an error
-    docker stop immuta-fingerprint
-    docker rm immuta-fingerprint
-    docker stop immuta-fingerprint-devel
-    docker rm immuta-fingerprint-devel
-    pushd $FINGERPRINT_DIR
-    if not set -q _flag_runOnly
-        make immuta-fingerprint-devel
-    end
-    echo "run 'poetry run immuta-fingerprint --log-level DEBUG' when u get in the container"
-    docker run \
-        -it \
-        --publish 5001:5001 \
-        --name=immuta-fingerprint-devel \
-        --add-host=db.immuta:10.0.2.2 \
-        -v "$PWD"/fingerprint:/opt/immuta/fingerprint/fingerprint \
-        --entrypoint /bin/bash \
-        immuta-fingerprint:latest-devel
-    popd
-end
-
-function buildDevPost
-    if read_confirm "Do you want to stop and rebuild the pg container?"
-        killPg
-        pushd $BODATA_DIR
-        if not make db MAKE_JOBS=4
-            popd
-            return 1
-        end
-        popd
-        pushd $BODATA_DIR/postgresql
-        docker build -t immuta-db-dev -f DevDocker .
-        # docker run -d -p 5432:5432 -v ${PWD}:/src --name=immuta-db-dev -e IMMUTA_REMOTE_QUERY=true --add-host=service.immuta:10.0.2.2 -it immuta-db-dev 
-        # docker run -d --cap-add=SYS_PTRACE --cap-add=SYS_TIME --security-opt seccomp=unconfined -e IMMUTA_REMOTE_QUERY=true -p 5432:5432 -v ${PWD}:/usr/src --name=immuta-db-dev --add-host=service.immuta:10.0.2.2 -it immuta-db-dev
-        # docker run -d --cap-add=SYS_PTRACE --cap-add=SYS_TIME --security-opt seccomp=unconfined -e IMMUTA_REMOTE_QUERY=true -p 5432:5432 -p 9091:9091 -v $PWD:/usr/src -v $BODATA_DIR:/bodata --name=immuta-db-dev --add-host=service.immuta:10.0.2.2 -it immuta-db-dev
-        docker run -d --cap-add=SYS_PTRACE --cap-add=SYS_TIME --security-opt seccomp=unconfined -e IMMUTA_REMOTE_QUERY=true -p 5432:5432 -v {$PWD}:/usr/src --name=immuta-db-dev --add-host=service.immuta:10.0.2.2 $argv -it immuta-db-dev
-        popd
-        # docker run -d -p 5432:5432 -v ${PWD}:/src --name=immuta-db-dev -e IMMUTA_REMOTE_QUERY=true --add-host=service.immuta:10.0.2.2 -it immuta-db-dev 
-        #docker run -d -p 5432:5432 -v ${PWD}:/src --name=immuta-db-dev --add-host=service.immuta:10.0.2.2 -it immuta-db-dev 
-    end
 end
 
 function mochaFile
     npx _mocha --inline-diffs -r source-map-support/register -r ts-node/register --timeout 999999 --colors $argv
 end
-
 
 function im --wraps="immuta"
     pushd $CLI_DIR
