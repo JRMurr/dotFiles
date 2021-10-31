@@ -5,6 +5,13 @@ if not functions -q fisher
     fish -c fisher
 end
 
+# setup zoxide https://github.com/ajeetdsouza/zoxide#installation
+if type -q zoxide
+    zoxide init fish | source
+    set -g _ZO_DATA_DIR $HOME/.local/share/zoxide
+    set -g _ZO_ECHO 1
+end
+
 # load all the custom funcs 
 for file in ~/.config/fish/customFuncs/common/*
     source $file
