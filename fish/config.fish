@@ -1,3 +1,4 @@
+set -q XDG_CONFIG_HOME; or set XDG_CONFIG_HOME ~/.config
 
 # setup zoxide https://github.com/ajeetdsouza/zoxide#installation
 if type -q zoxide
