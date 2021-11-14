@@ -1,3 +1,4 @@
+bass source "~/.nix-profile/etc/profile.d/hm-session-vars.sh" # setup by home manager
 eval (direnv hook fish)
 
 set -x VISUAL vim
